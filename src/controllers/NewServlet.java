@@ -1,7 +1,7 @@
 package controllers;
 
 import java.io.IOException;
-import java.util.List;
+import java.sql.Timestamp;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
@@ -14,16 +14,16 @@ import models.Task;
 import utils.DBUtil;
 
 /**
- * Servlet implementation class IndexServlet
+ * Servlet implementation class NewServlet
  */
-@WebServlet("/index")
-public class IndexServlet extends HttpServlet {
+@WebServlet("/new")
+public class NewServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public IndexServlet() {
+    public NewServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -33,12 +33,26 @@ public class IndexServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // TODO Auto-generated method stub
-        EntityManager em = DBUtil.createEntityManager();
 
-        List<Task> tasks = em.createNamedQuery("getAllTasks", Task.class).getResultList();
-        response.getWriter().append(Integer.valueOf(tasks.size()).toString());
+        EntityManager em = DBUtil.createEntityManager();
+        em.getTransaction().begin();
+
+        Task t = new Task();
+
+        String content = "public relations";
+        t.setContent(content);
+
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        t.setCreated_at(currentTime);
+        t.setUpdated_at(currentTime);
+
+        em.persist(t);
+        em.getTransaction().commit();
+
+        response.getWriter().append(Integer.valueOf(t.getId()).toString());
 
         em.close();
+
     }
 
 }
